@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html><head lang="en"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>HeRF</title>
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!--    <meta property="og:image" content="https://dorverbin.github.io/refnerf/img/refnerf_titlecard.jpg">-->
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
+<!--    <meta property="og:url" content="https://dorverbin.github.io/refnerf">-->
+    <meta property="og:title" content="HeRF: A Hierarchical Framework for Efficient and Extendable New View Synthesis">
+    <meta property="og:description" content="Recently, neural radiance fields have made significant advancements in rendering new views.
+    However, limited research has focused on dynamically loading implicit radiance fields with efficient memory utilization and extended scene representation.
+    This paper introduces HeRF, a novel framework with a hierarchical scene representation based on layered sparse voxels.
+    With such an adaptive design, our method is able to partition scenes into different levels for faster modeling and reduced memory cost.
+    Furthermore, these partitioned scenes can be dynamically loaded and joined for a better immersive experience.
+    Quantitative and qualitative analysis using object-level, indoor, and outdoor datasets demonstrates the effectiveness of HeRF.
+    Remarkably, our proposed method requires only about 38% of the training rays and 45% of the GPU memory cost, yet achieves a 9% improvement in PSNR compared to NeRFusion on the ScanNet dataset. ">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HeRF: A Hierarchical Framework for <br> for Efficient and Extendable New View Synthesis">
+    <meta name="twitter:description" content="Recently, neural radiance fields have made significant advancements in rendering new views.
+    However, limited research has focused on dynamically loading implicit radiance fields with efficient memory utilization and extended scene representation.
+    This paper introduces HeRF, a novel framework with a hierarchical scene representation based on layered sparse voxels.
+    With such an adaptive design, our method is able to partition scenes into different levels for faster modeling and reduced memory cost.
+    Furthermore, these partitioned scenes can be dynamically loaded and joined for a better immersive experience.
+    Quantitative and qualitative analysis using object-level, indoor, and outdoor datasets demonstrates the effectiveness of HeRF.
+    Remarkably, our proposed method requires only about 38% of the training rays and 45% of the GPU memory cost, yet achieves a 9% improvement in PSNR compared to NeRFusion on the ScanNet dataset.">
+<!--    <meta name="twitter:image" content="https://dorverbin.github.io/refnerf/img/refnerf_titlecard.jpg">-->
+
+
+    <!-- mirror: F0%9F%AA%9E&lt -->
+    <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;%E2%9A%A1&lt;/text&gt;&lt;/svg&gt;">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/codemirror.min.css">
+    <link rel="stylesheet" href="css/app.css">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/codemirror.min.js"></script>
+    <script src="js/clipboard.min.js"></script>
+    <script src="js/video_comparison.js"></script>
+    <script src="js/app.js"></script>
+</head>
+
+<body>
+    <div class="container" id="header" style="text-align: center; margin: auto;">
+        <div class="row" id="title-row" style="max-width: 100%; margin: 0 auto; display: inline-block">
+            <h2 class="col-md-12 text-center" id="title">
+                <b>HeRF</b>: A Hierarchical Framework for <br> Efficient and Extendable New View Synthesis <br>
+                <small>
+                    IJCNN 2024
+                </small>
+            </h2>
+        </div>
+        <div class="row" id="author-row" style="margin:0 auto;">
+            <div class="col-md-12 text-center" style="display: table; margin:0 auto">
+                <table class="author-table" id="author-table">
+
+                    <tr>
+                        <td>
+                            <a style="text-decoration:none">
+                              Xiaoyan Yang
+                            </a>1,
+
+                        </td>
+                        <td>
+                            <a style="text-decoration:none" href="">
+                              Dingbo Lu
+                            </a>1,
+                        </td>
+                        <td>
+                            <a style="text-decoration:none" href="">
+                                Wenjie Liu
+                            </a>,
+                        </td>
+                        <td>
+                            <a style="text-decoration:none" href="">
+                                Ling You
+                            </a>,
+                        </td>
+
+                        <td>
+                            <a style="text-decoration:none" href="">
+                                Yang Li
+                            </a>2,
+                        </td>
+                        <td>
+                            <a style="text-decoration:none" href="">
+                                Changbo Wang
+                            </a>2
+                        </td>
+                    </tr>
+
+                </table>
+                East China Normal University
+                <br>1 Equal Contribution, 2 Corresponding Authors <br><br>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('author-row').style.maxWidth = document.getElementById("title-row").clientWidth + 'px';
+    </script>
+    <div class="container" id="main">
+        <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 text-center">
+                    <ul class="nav nav-pills nav-justified">
+                        <li>
+<!--                        <a href="https://arxiv.org/abs/2112.03907">-->
+                            <img src="./img/paper_image.png" height="60px">
+                                <h4><strong>Paper</strong></h4>
+                            </a>
+                        </li>
+                        <li>
+<!--                        <a href="https://youtu.be/qrdRH9irAlk">-->
+                            <img src="./img/youtube_icon.png" height="60px">
+                                <h4><strong>Video</strong></h4>
+                            </a>
+                        </li>
+                        <li>
+<!--                        <a href="https://github.com/google-research/multinerf" target="_blank">-->
+                            <img src="img/github.png" height="60px">
+                                <h4><strong>Code</strong></h4>
+                            </a>
+                        </li>
+                        ( coming soon )
+                    </ul>
+                </div>
+        </div>
+
+
+
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Abstract
+                </h3>
+                <p class="text-justify">
+                    Recently, neural radiance fields have made significant advancements in rendering new views.
+                    However, limited research has focused on dynamically loading implicit radiance fields with efficient memory utilization and extended scene representation.
+                    This paper introduces HeRF, a novel framework with a hierarchical scene representation based on layered sparse voxels.
+                    With such an adaptive design, our method is able to partition scenes into different levels for faster modeling and reduced memory cost.
+                    Furthermore, these partitioned scenes can be dynamically loaded and joined for a better immersive experience.
+                    Quantitative and qualitative analysis using object-level, indoor, and outdoor datasets demonstrates the effectiveness of HeRF.
+                    Remarkably, our proposed method requires only about 38% of the training rays and 45% of the GPU memory cost, yet achieves a 9% improvement in PSNR compared to NeRFusion on the ScanNet dataset.
+                </p>
+            </div>
+        </div>
+
+        <image src="img/teaser_table.png" class="img-responsive" alt="overview" width="50%" style="max-height: 450px;margin:auto;">
+
+<!--        <div class="row">-->
+<!--            <div class="col-md-8 col-md-offset-2">-->
+<!--                <h3>-->
+<!--                    Video-->
+<!--                </h3>-->
+<!--                <div class="text-center">-->
+<!--                    <div style="position:relative;padding-top:56.25%;">-->
+<!--                        <iframe src="https://youtube.com/embed/qrdRH9irAlk" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Hierarchical Sparse Voxel Representation
+                </h3>
+                <div class="text-justify">
+                    Specifically, HeRF first segments the scenes on the block level, applies feature decomposition on the group level, learns geometric representation on the voxel level, and loads scenes dynamically on the chunk level. Such an adaptive hierarchical design enables efficient learning and less memory cost.
+                    
+                    <br><br>
+                    
+                </div>
+                <div class="text-center">
+                    <img src="./img/representation.png" width="50%">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Voxel initialization, Ray Sampling, and Tensor Decomposition
+                </h3>
+                <div class="text-justify">
+                    The largest pink box represents the <b>Block</b>,
+                    the second-largest blue dashed box represents the <b>Group</b>,
+                    and the smallest yellow box represents the <b>Group</b>.
+                    On the left, we show the initialization of active voxels.
+                    The navy blue cross represents the input point cloud P,
+                    which indicates the geometric surface.
+                    Voxels are constructed as a hierarchical and sparse structure,
+                    with the active voxel highlighted in yellow.
+                    In the middle picture, we demonstrate samples filtered by sparse active voxels.
+                    On the right, we perform tensor decomposition on the group and deterministic integration on sparse voxels.
+                    At the group level, the horizontal and vertical arrows represent the decomposed basis vectors.
+                    For the points sampled along the ray,
+                    only the points within the active voxel contribute to the subsequent integration operation.
+                </div>
+                <br>
+                <div class="text-center">
+                    <img src="./img/voxel_initial.png" width="100%">
+                </div>
+                <br>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Adaptive Partition and Dynamic Loading
+                </h3>
+                <div class="text-justify">
+                    The blue outline in the figure represents the scene geometry, while the gray dotted frames indicate the blocks that have been adaptively divided. When considering a set of camera perspectives, all visible blocks consist of a chunk which is dynamically loaded into the GPU (pink), while the remaining blocks that are not within the camera's field of view are stored in the CPU (yellow).
+                </div>
+                <br>
+                <div class="text-center">
+                    <img src="./img/dynamic_loading.png" width="50%">
+                </div>
+                <br>
+            </div>
+        </div>
+
+<!--        <div class="row">-->
+<!--            <div class="col-md-8 col-md-offset-2">-->
+<!--                <h3>-->
+<!--                    Additional Synthetic Results-->
+<!--                </h3>-->
+<!--                <div class="video-compare-container">-->
+<!--                    <video class="video" id="musclecar" loop playsinline autoPlay muted src="video/musclecar_mipnerf_ours.mp4" onplay="resizeAndPlay(this)"></video>-->
+<!--                    <canvas height=0 class="videoMerge" id="musclecarMerge"></canvas>-->
+<!--                </div>-->
+<!--			</div>-->
+<!--        </div>-->
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Visualization Results
+                </h3>
+                <div class="text-justify">
+                    Our method has a better convergence effect than TensoRF under the same number of training steps, and optimizes more details of the scene, such as debris on the desk, books on the bookshelf and paintings on the wall. Although NeRFusion is similar to our visual effect, it takes a lot of time to pre-train a model, and then perform a single optimization of the scene.
+                </div>
+
+                <div class="text-center">
+                    <img src="./img/compare_with_sota.png" width="100%">
+                </div>
+
+                <br>
+<!--                <div class="text-justify">-->
+<!--                    Our method achieves results that are clearer when compared to ground truth,-->
+<!--                    especially in restoring clearer characters in the motion blur region.-->
+<!--                    Furthermore, our method has a low computational cost,-->
+<!--                    as the rendering process only requires 4.4 gigabytes of GPU with 4096 rays.-->
+<!--                </div>-->
+
+<!--                <div class="video-compare-container">-->
+<!--                    <video class="video" id="compare_with_gt" loop playsinline autoPlay muted src="video/demo_gt.mp4" onplay="resizeAndPlay(this)"></video>-->
+<!--                </div>-->
+
+
+<!--                <table width="100%">-->
+<!--                    <tr>-->
+<!--                        <td align="left" valign="top" width="50%">-->
+<!--                            <video id="v2" width="100%" playsinline autoplay loop muted>-->
+<!--                                <source src="video/car_color2.mp4" type="video/mp4" />-->
+<!--                            </video>-->
+<!--                        </td>-->
+<!--                        <td align="left" valign="top" width="50%">-->
+<!--                            <video id="v3" width="100%" playsinline autoplay loop muted>-->
+<!--                                <source src="video/car_color3.mp4" type="video/mp4" />-->
+<!--                            </video>-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                </table>-->
+
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Dynamic Loading
+                </h3>
+
+                <div class="text-justify">
+                    Due to the advantages of sparse voxel representation and dynamic loading of blocks,
+                    our method excels in rendering indoor scenes with spatial position changes.
+                    To visualize this capability,
+                    we showcase the rendered image produced after dynamic loading, while maintaining a small memory footprint.
+                </div>
+                <div class="video-compare-container">
+                    <video class="video" id="musclecar" loop playsinline autoPlay muted src="video/demo_load.mp4" onplay="resizeAndPlay(this)"></video>
+<!--                    <canvas height=0 class="videoMerge" id="musclecarMerge"></canvas>-->
+                </div>
+            </div>
+        </div>
+
+            
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Citation
+                </h3>
+                <div class="form-group col-md-10 col-md-offset-1">
+                    <textarea id="bibtex" class="form-control" readonly>
+@article{TODO,
+    title={{HeRF}: A Hierarchical Framework for Efficient and Extendable New View Synthesis},
+    author={Xiaoyan Yang, Dingbo Lu, Wenjie Liu, Ling You, Yang Li, Changbo Wang},
+    journal={IJCNN},
+    year={2024}
+}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Acknowledgements
+                </h3>
+                <p class="text-justify">
+
+                The website template was borrowed from <a href="http://mgharbi.com/">Michaël Gharbi</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</body></html>
